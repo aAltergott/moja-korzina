@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#176b52">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Моя корзина">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Моя корзина</title>
+<style>
+:root{color-scheme:light;--green:#176b52;--pale:#eaf5ef;--ink:#18231e;--muted:#718078;--line:#e3eae5}
+*{box-sizing:border-box}body{margin:0;background:#f5f8f6;color:var(--ink);font:16px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding:env(safe-area-inset-top) 16px env(safe-area-inset-bottom)}
+main{max-width:620px;margin:0 auto;padding:22px 0 34px}.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+h1{font-size:27px;margin:0;font-weight:800;letter-spacing:-.6px}.subtitle{color:var(--muted);font-size:13px;margin-top:5px}
+.pill{background:var(--pale);color:var(--green);font-weight:700;padding:8px 12px;border-radius:30px;font-size:13px}
+.panel{background:white;border:1px solid var(--line);border-radius:18px;padding:14px;margin-bottom:14px;box-shadow:0 3px 14px #153d2810}
+form{display:flex;gap:8px}.field{min-width:0;flex:1;border:1px solid var(--line);border-radius:12px;padding:13px;font:inherit;background:#fff;color:var(--ink)}
+.qty{width:75px;flex:none}.add{border:0;background:var(--green);color:white;border-radius:12px;width:48px;font-size:25px;font-weight:500}
+.section{display:flex;justify-content:space-between;align-items:center;margin:19px 3px 9px;font-size:14px;font-weight:750}.hint{font-size:12px;color:var(--muted);font-weight:500}
+ul{list-style:none;padding:0;margin:0}.item{display:flex;align-items:center;gap:9px;padding:11px 8px;border-bottom:1px solid #eef2ef;min-height:57px;background:#fff;border-radius:10px}.item:last-child{border-bottom:0}
+.item.done .name{text-decoration:line-through;color:#9aa59e}.check{width:23px;height:23px;accent-color:var(--green);flex:none}
+.name{flex:1;min-width:0;overflow-wrap:anywhere}.qtytag{color:var(--muted);font-size:13px;margin-left:5px}
+.move{border:0;background:#f1f5f2;color:#4b5c52;border-radius:8px;width:32px;height:32px;font-size:16px;flex:none}.move:disabled{opacity:.25}
+.handle{color:#9aa79f;font-size:20px;padding:0 2px;touch-action:none;cursor:grab;user-select:none}
+.delete{border:0;background:transparent;color:#9aa59e;font-size:19px;padding:5px}
+.dragging{opacity:.35;background:#edf6f0}.empty{padding:22px 10px;text-align:center;color:var(--muted);font-size:14px}
+.footer{display:flex;justify-content:space-between;align-items:center;gap:10px;color:var(--muted);font-size:13px;margin-top:13px}
+.secondary{border:1px solid var(--line);background:white;color:#53645a;border-radius:10px;padding:9px 11px;font-size:13px}
+.listname{border:0;background:transparent;font:inherit;font-weight:800;color:var(--ink);max-width:180px}
+.installnote{background:#fff8e8;border:1px solid #f1dfb7;border-radius:14px;padding:13px;font-size:13px;line-height:1.45;margin-top:16px;color:#66522b}
+@media(min-width:500px){main{padding-top:35px}}
+</style>
+</head>
+<body>
+<main>
+ <div class="top">
+  <div><h1>🛒 Моя корзина</h1><div class="subtitle">Список покупок всегда под рукой</div></div>
+  <div class="pill" id="counter">0 / 0</div>
+ </div>
+ <div class="panel">
+  <div style="font-size:13px;font-weight:700;margin:0 0 10px 2px">Добавить товар</div>
+  <form id="addForm">
+   <input class="field" id="product" placeholder="Например, молоко" autocomplete="off" required>
+   <input class="field qty" id="quantity" placeholder="Кол-во" value="1" aria-label="Количество">
+   <button class="add" aria-label="Добавить">+</button>
+  </form>
+ </div>
+ <div class="section"><span>Нужно купить</span><span class="hint">Перетаскивай за ⋮⋮ или используй стрелки</span></div>
+ <div class="panel" style="padding:5px 9px">
+  <ul id="list"></ul>
+  <div class="empty" id="empty">Список пока пуст. Добавь первый товар выше.</div>
+ </div>
+ <div class="footer"><span id="remaining">Осталось: 0</span><button class="secondary" id="clearDone">Убрать купленное</button></div>
+ <div class="installnote" id="install">
+  <b>Как добавить на экран iPhone:</b><br>
+  Открой эту страницу в Safari, нажми <b>«Поделиться»</b> → <b>«На экран Домой»</b> → <b>«Добавить»</b>.
+ </div>
+</main>
+<script>
+const KEY='my-basket-items-v1';
+let items=[];
+try{items=JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){items=[]}
+const list=document.querySelector('#list'),empty=document.querySelector('#empty');
+const save=()=>localStorage.setItem(KEY,JSON.stringify(items));
+function render(){
+ list.innerHTML='';
+ items.forEach((it,i)=>{
+  const li=document.createElement('li');li.className='item'+(it.done?' done':'');li.dataset.index=i;
+  const cb=document.createElement('input');cb.type='checkbox';cb.className='check';cb.checked=!!it.done;cb.setAttribute('aria-label','Отметить купленным');cb.onchange=()=>{it.done=cb.checked;save();render()};
+  const grip=document.createElement('span');grip.className='handle';grip.textContent='⋮⋮';grip.title='Перетащить';
+  const name=document.createElement('span');name.className='name';name.textContent=it.name;
+  if(it.qty){const q=document.createElement('span');q.className='qtytag';q.textContent='× '+it.qty;name.append(q)}
+  const up=document.createElement('button');up.className='move';up.textContent='↑';up.title='Переместить выше';up.disabled=i===0;up.onclick=()=>move(i,i-1);
+  const down=document.createElement('button');down.className='move';down.textContent='↓';down.title='Переместить ниже';down.disabled=i===items.length-1;down.onclick=()=>move(i,i+1);
+  const del=document.createElement('button');del.className='delete';del.textContent='×';del.title='Удалить';del.onclick=()=>{items.splice(i,1);save();render()};
+  li.append(cb,grip,name,up,down,del);list.append(li);
+ });
+ empty.style.display=items.length?'none':'block';
+ const bought=items.filter(x=>x.done).length;
+ document.querySelector('#counter').textContent=`${bought} / ${items.length}`;
+ document.querySelector('#remaining').textContent=`Осталось купить: ${items.length-bought}`;
+}
+function move(from,to){if(to<0||to>=items.length)return;const [x]=items.splice(from,1);items.splice(to,0,x);save();render()}
+document.querySelector('#addForm').addEventListener('submit',e=>{
+ e.preventDefault();const name=document.querySelector('#product').value.trim();if(!name)return;
+ const qty=document.querySelector('#quantity').value.trim();
+ items.push({name,qty,done:false});document.querySelector('#product').value='';document.querySelector('#quantity').value='1';save();render();document.querySelector('#product').focus();
+});
+document.querySelector('#clearDone').onclick=()=>{items=items.filter(x=>!x.done);save();render()};
+let dragged=null;
+list.addEventListener('dragstart',e=>{const row=e.target.closest('.item');if(!row)return;dragged=Number(row.dataset.index);row.classList.add('dragging');e.dataTransfer.effectAllowed='move'});
+list.addEventListener('dragover',e=>{e.preventDefault();const row=e.target.closest('.item');if(!row||dragged===null)return;const to=Number(row.dataset.index);if(to!==dragged){const [x]=items.splice(dragged,1);items.splice(to,0,x);dragged=to;render()}});
+list.addEventListener('dragend',()=>{dragged=null;save();render()});
+// Touch-friendly reordering: press and hold the grip, then move the finger.
+let touchFrom=null;
+list.addEventListener('pointerdown',e=>{if(!e.target.classList.contains('handle'))return;const row=e.target.closest('.item');touchFrom=Number(row.dataset.index);e.target.setPointerCapture?.(e.pointerId)});
+list.addEventListener('pointermove',e=>{if(touchFrom===null)return;const el=document.elementFromPoint(e.clientX,e.clientY)?.closest('.item');if(!el)return;const to=Number(el.dataset.index);if(to!==touchFrom){const [x]=items.splice(touchFrom,1);items.splice(to,0,x);touchFrom=to;save();render()}});
+list.addEventListener('pointerup',()=>{if(touchFrom!==null){touchFrom=null;save();render()}});
+render();
+if('serviceWorker' in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
+</script>
+</body></html>
