@@ -53,7 +53,12 @@ ul{list-style:none;padding:0;margin:0}.item{display:flex;align-items:center;gap:
   <ul id="list"></ul>
   <div class="empty" id="empty">Список пока пуст. Добавь первый товар выше.</div>
  </div>
- <div class="footer"><span id="remaining">Осталось: 0</span><button class="secondary" id="clearDone">Убрать купленное</button></div>
+<div class="footer"><span id="remaining">Осталось: 0</span><button class="secondary" id="toggleHistory">Показать купленное (0)</button></div>
+<div id="historyArea" hidden>
+ <h3>Куплено</h3>
+ <ul id="historyList"></ul>
+ <div class="empty" id="historyEmpty">Пока ничего не куплено.</div>
+</div>
  <div class="installnote" id="install">
   <b>Как добавить на экран iPhone:</b><br>
   Открой эту страницу в Safari, нажми <b>«Поделиться»</b> → <b>«На экран Домой»</b> → <b>«Добавить»</b>.
@@ -62,34 +67,50 @@ ul{list-style:none;padding:0;margin:0}.item{display:flex;align-items:center;gap:
 <script>
 const KEY='my-basket-items-v1';
 let items=[];
+let showDone=false;
 try{items=JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){items=[]}
 const list=document.querySelector('#list'),empty=document.querySelector('#empty');
 const save=()=>localStorage.setItem(KEY,JSON.stringify(items));
 function render(){
+ items.sort((a,b)=>Number(a.done)-Number(b.done));
  list.innerHTML='';
- items.forEach((it,i)=>{
-  const li=document.createElement('li');li.className='item'+(it.done?' done':'');li.dataset.index=i;
-  const cb=document.createElement('input');cb.type='checkbox';cb.className='check';cb.checked=!!it.done;cb.setAttribute('aria-label','Отметить купленным');cb.onchange=()=>{it.done=cb.checked;save();render()};
-  const grip=document.createElement('span');grip.className='handle';grip.textContent='⋮⋮';grip.title='Перетащить';
+ const active=items.filter(x=>!x.done);
+ const bought=items.filter(x=>x.done);
+ active.forEach((it,i)=>{
+  const li=document.createElement('li');li.className='item';li.dataset.index=items.indexOf(it); 
+  const cb=document.createElement('input');cb.type='checkbox';cb.className='check';cb.checked=false;cb.onchange=()=>{it.done=true;save();render()};
+  const grip=document.createElement('span');grip.className='handle';grip.textContent='⋮⋮';
   const name=document.createElement('span');name.className='name';name.textContent=it.name;
   if(it.qty){const q=document.createElement('span');q.className='qtytag';q.textContent='× '+it.qty;name.append(q)}
-  const up=document.createElement('button');up.className='move';up.textContent='↑';up.title='Переместить выше';up.disabled=i===0;up.onclick=()=>move(i,i-1);
-  const down=document.createElement('button');down.className='move';down.textContent='↓';down.title='Переместить ниже';down.disabled=i===items.length-1;down.onclick=()=>move(i,i+1);
-  const del=document.createElement('button');del.className='delete';del.textContent='×';del.title='Удалить';del.onclick=()=>{items.splice(i,1);save();render()};
+  const up=document.createElement('button');up.className='move';up.textContent='↑';up.disabled=i===0;up.onclick=()=>move(items.indexOf(it),items.indexOf(it)-1);
+  const down=document.createElement('button');down.className='move';down.textContent='↓';down.disabled=i===active.length-1;down.onclick=()=>move(items.indexOf(it),items.indexOf(it)+1);
+  const del=document.createElement('button');del.className='delete';del.textContent='×';del.onclick=()=>{if(confirm('Удалить товар навсегда?')){items.splice(items.indexOf(it),1);save();render()}};
   li.append(cb,grip,name,up,down,del);list.append(li);
  });
- empty.style.display=items.length?'none':'block';
- const bought=items.filter(x=>x.done).length;
- document.querySelector('#counter').textContent=`${bought} / ${items.length}`;
- document.querySelector('#remaining').textContent=`Осталось купить: ${items.length-bought}`;
+ empty.style.display=active.length?'none':'block';
+ const historyList=document.querySelector('#historyList');
+ historyList.innerHTML='';
+ bought.forEach(it=>{
+  const li=document.createElement('li');li.className='item done';
+  const cb=document.createElement('input');cb.type='checkbox';cb.className='check';cb.checked=true;cb.onchange=()=>{it.done=false;save();render()};
+  const name=document.createElement('span');name.className='name';name.textContent=it.name;
+  if(it.qty){const q=document.createElement('span');q.className='qtytag';q.textContent='× '+it.qty;name.append(q)}
+  const del=document.createElement('button');del.className='delete';del.textContent='×';del.onclick=()=>{if(confirm('Удалить товар навсегда?')){items.splice(items.indexOf(it),1);save();render()}};
+  li.append(cb,name,del);historyList.append(li);
+ });
+ document.querySelector('#historyEmpty').style.display=bought.length?'none':'block';
+ document.querySelector('#toggleHistory').textContent=(showDone?'Скрыть':'Показать')+' купленное ('+bought.length+')';
+ document.querySelector('#historyArea').hidden=!showDone;
+ document.querySelector('#counter').textContent=`${bought.length} / ${items.length}`;
+ document.querySelector('#remaining').textContent=`Осталось купить: ${active.length}`;
 }
-function move(from,to){if(to<0||to>=items.length)return;const [x]=items.splice(from,1);items.splice(to,0,x);save();render()}
+document.querySelector('#toggleHistory').onclick=()=>{showDone=!showDone;render()};
+ function move(from,to){const activeCount=items.filter(x=>!x.done).length;if(to<0||to>=activeCount)return;const [x]=items.splice(from,1);items.splice(to,0,x);save();render()}
 document.querySelector('#addForm').addEventListener('submit',e=>{
  e.preventDefault();const name=document.querySelector('#product').value.trim();if(!name)return;
  const qty=document.querySelector('#quantity').value.trim();
  items.push({name,qty,done:false});document.querySelector('#product').value='';document.querySelector('#quantity').value='1';save();render();document.querySelector('#product').focus();
 });
-document.querySelector('#clearDone').onclick=()=>{items=items.filter(x=>!x.done);save();render()};
 let dragged=null;
 list.addEventListener('dragstart',e=>{const row=e.target.closest('.item');if(!row)return;dragged=Number(row.dataset.index);row.classList.add('dragging');e.dataTransfer.effectAllowed='move'});
 list.addEventListener('dragover',e=>{e.preventDefault();const row=e.target.closest('.item');if(!row||dragged===null)return;const to=Number(row.dataset.index);if(to!==dragged){const [x]=items.splice(dragged,1);items.splice(to,0,x);dragged=to;render()}});
