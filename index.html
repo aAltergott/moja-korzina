@@ -68,70 +68,98 @@ try{items=JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){items=[]}
 const list=document.querySelector('#list'),empty=document.querySelector('#empty');
 const save=()=>localStorage.setItem(KEY,JSON.stringify(items));
 function render(){
- items.sort((a,b)=>Number(a.done)-Number(b.done));
- list.innerHTML='';
  const active=items.filter(x=>!x.done);
  const bought=items.filter(x=>x.done);
- active.forEach((it,i)=>{
-  const li=document.createElement('li');li.className='item';li.dataset.index=items.indexOf(it); 
-  const cb=document.createElement('input');cb.type='checkbox';cb.className='check';cb.checked=false;cb.onchange=()=>{it.done=true;save();render()};
-  const grip=document.createElement('span');grip.className='handle';grip.textContent='⋮⋮';
-  const name=document.createElement('span');name.className='name';name.textContent=it.name;
-  if(it.qty){const q=document.createElement('span');q.className='qtytag';q.textContent='× '+it.qty;name.append(q)}
-    const edit=document.createElement('button');
+ const visible=showDone?items:active;
+ list.innerHTML='';
+
+ visible.forEach((it,i)=>{
+  const li=document.createElement('li');
+  li.className='item'+(it.done?' done':'');
+  li.dataset.index=items.indexOf(it);
+
+  const cb=document.createElement('input');
+  cb.type='checkbox';
+  cb.className='check';
+  cb.checked=it.done;
+  cb.onchange=()=>{it.done=cb.checked;save();render()};
+
+  const grip=document.createElement('span');
+  grip.className='handle';
+  grip.textContent='⋮⋮';
+
+  const name=document.createElement('span');
+  name.className='name';
+  name.textContent=it.name;
+
+  if(it.qty){
+   const q=document.createElement('span');
+   q.className='qtytag';
+   q.textContent='× '+it.qty;
+   name.append(q);
+  }
+
+  const edit=document.createElement('button');
   edit.className='move';
   edit.textContent='✎';
   edit.title='Menge ändern';
   edit.onclick=()=>{
- const newName=prompt('Neuen Artikelnamen eingeben:',it.name);
- if(newName===null)return;
- if(!newName.trim()){alert('Bitte einen Artikelnamen eingeben.');return;}
- const qty=prompt('Neue Menge eingeben:',it.qty||'1');
- if(qty===null)return;
- it.name=newName.trim();
- it.qty=qty.trim();
- save();
- render();
-};
-  const up=document.createElement('button');up.className='move';up.textContent='↑';up.disabled=i===0;up.onclick=()=>move(items.indexOf(it),items.indexOf(it)-1);
-  const down=document.createElement('button');down.className='move';down.textContent='↓';down.disabled=i===active.length-1;down.onclick=()=>move(items.indexOf(it),items.indexOf(it)+1);
-  const del=document.createElement('button');del.className='delete';del.textContent='×';del.onclick=()=>{if(confirm('Artikel endgültig löschen?')){items.splice(items.indexOf(it),1);save();render()}};
-  li.append(cb,grip,name,edit,up,down,del);list.append(li);
+   const newName=prompt('Neuen Artikelnamen eingeben:',it.name);
+   if(newName===null)return;
+   if(!newName.trim()){alert('Bitte einen Artikelnamen eingeben.');return;}
+   const qty=prompt('Neue Menge eingeben:',it.qty||'1');
+   if(qty===null)return;
+   it.name=newName.trim();
+   it.qty=qty.trim();
+   save();
+   render();
+  };
+
+  const up=document.createElement('button');
+  up.className='move';
+  up.textContent='↑';
+  up.disabled=i===0;
+  up.onclick=()=>move(items.indexOf(it),items.indexOf(it)-1);
+
+  const down=document.createElement('button');
+  down.className='move';
+  down.textContent='↓';
+  down.disabled=i===visible.length-1;
+  down.onclick=()=>move(items.indexOf(it),items.indexOf(it)+1);
+
+  const del=document.createElement('button');
+  del.className='delete';
+  del.textContent='×';
+  del.onclick=()=>{
+   if(confirm('Artikel endgültig löschen?')){
+    items.splice(items.indexOf(it),1);
+    save();
+    render();
+   }
+  };
+
+  li.append(cb,grip,name,edit,up,down,del);
+  list.append(li);
  });
+
  empty.style.display=active.length?'none':'block';
- const historyList=document.querySelector('#historyList');
- historyList.innerHTML='';
- bought.forEach(it=>{
-  const li=document.createElement('li');li.className='item done';
-  const cb=document.createElement('input');cb.type='checkbox';cb.className='check';cb.checked=true;cb.onchange=()=>{it.done=false;save();render()};
-  const name=document.createElement('span');name.className='name';name.textContent=it.name;
-  if(it.qty){const q=document.createElement('span');q.className='qtytag';q.textContent='× '+it.qty;name.append(q)}
-    const edit=document.createElement('button');
-  edit.className='move';
-  edit.textContent='✎';
-  edit.title='Menge ändern';
-  edit.onclick=()=>{
- const newName=prompt('Neuen Artikelnamen eingeben:',it.name);
- if(newName===null)return;
- if(!newName.trim()){alert('Bitte einen Artikelnamen eingeben.');return;}
- const qty=prompt('Neue Menge eingeben:',it.qty||'1');
- if(qty===null)return;
- it.name=newName.trim();
- it.qty=qty.trim();
- save();
- render();
-};
-  const del=document.createElement('button');del.className='delete';del.textContent='×';del.onclick=()=>{if(confirm('Artikel endgültig löschen?')){items.splice(items.indexOf(it),1);save();render()}};
-  li.append(cb,name,edit,del);historyList.append(li);
- });
- document.querySelector('#historyEmpty').style.display=bought.length?'none':'block';
- document.querySelector('#toggleHistory').textContent=(showDone?'Eingekaufte ausblenden':'Eingekaufte anzeigen')+' ('+bought.length+')';
- document.querySelector('#historyArea').hidden=!showDone;
+
+ document.querySelector('#toggleHistory').textContent=
+  (showDone?'Ausgeblendete ausblenden':'Ausgeblendete anzeigen')+
+  ' ('+bought.length+')';
+
+ document.querySelector('#historyArea').hidden=true;
  document.querySelector('#counter').textContent=`${bought.length} / ${items.length}`;
  document.querySelector('#remaining').textContent=`Noch zu kaufen: ${active.length}`;
 }
 document.querySelector('#toggleHistory').onclick=()=>{showDone=!showDone;render()};
- function move(from,to){const activeCount=items.filter(x=>!x.done).length;if(to<0||to>=activeCount)return;const [x]=items.splice(from,1);items.splice(to,0,x);save();render()}
+ function move(from,to){
+ if(to<0||to>=items.length)return;
+ const [x]=items.splice(from,1);
+ items.splice(to,0,x);
+ save();
+ render();
+}
 document.querySelector('#addForm').addEventListener('submit',e=>{
  e.preventDefault();const name=document.querySelector('#product').value.trim();if(!name)return;
  const qty=document.querySelector('#quantity').value.trim();
