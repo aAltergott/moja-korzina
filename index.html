@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ru">
+<html lang="de">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -37,18 +37,18 @@ ul{list-style:none;padding:0;margin:0}.item{display:flex;align-items:center;gap:
 <body>
 <main>
  <div class="top">
-  <div><h1>🛒 Моя корзина</h1><div class="subtitle">Список покупок всегда под рукой</div></div>
+  <div><h1>🛒 Einkaufsliste</h1><div class="subtitle">Deine Einkaufsliste immer griffbereit</div></div>
   <div class="pill" id="counter">0 / 0</div>
  </div>
  <div class="panel">
-  <div style="font-size:13px;font-weight:700;margin:0 0 10px 2px">Добавить товар</div>
+  <div style="font-size:13px;font-weight:700;margin:0 0 10px 2px">Artikel hinzufügen</div>
   <form id="addForm">
   <input class="field" id="product" placeholder="Zum Beispiel Milch" autocomplete="off" required>
    <input class="field qty" id="quantity" placeholder="Menge" value="1" aria-label="Menge">
    <button class="add" aria-label="Hinzufügen">+</button>
   </form>
  </div>
- <div class="section"><span>Нужно купить</span><span class="hint">Перетаскивай за ⋮⋮ или используй стрелки</span></div>
+ <div class="section"><span>Einkaufsliste</span><span class="hint">Zum Verschieben ziehen oder Pfeile benutzen</span></div>
  <div class="panel" style="padding:5px 9px">
   <ul id="list"></ul>
   <div class="empty" id="empty">Die Liste ist noch leer. Füge oben deinen ersten Artikel hinzu.</div>
@@ -59,7 +59,6 @@ ul{list-style:none;padding:0;margin:0}.item{display:flex;align-items:center;gap:
  <ul id="historyList"></ul>
  <div class="empty" id="historyEmpty">Noch nichts eingekauft.</div>
 </div>
- <div class="installnote" id="install">
 </main>
 <script>
 const KEY='my-basket-items-v1';
