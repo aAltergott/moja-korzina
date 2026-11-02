@@ -1,6 +1,6 @@
 {
-  "name": "Моя корзина — список покупок",
-  "short_name": "Корзина",
+  "name": "Einkaufsliste",
+"short_name": "Einkaufsliste",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
