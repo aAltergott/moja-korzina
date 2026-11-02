@@ -78,10 +78,21 @@ function render(){
   const grip=document.createElement('span');grip.className='handle';grip.textContent='⋮⋮';
   const name=document.createElement('span');name.className='name';name.textContent=it.name;
   if(it.qty){const q=document.createElement('span');q.className='qtytag';q.textContent='× '+it.qty;name.append(q)}
+    const edit=document.createElement('button');
+  edit.className='move';
+  edit.textContent='✎';
+  edit.title='Menge ändern';
+  edit.onclick=()=>{
+   const qty=prompt('Neue Menge eingeben:',it.qty||'1');
+   if(qty===null)return;
+   it.qty=qty.trim();
+   save();
+   render();
+  };
   const up=document.createElement('button');up.className='move';up.textContent='↑';up.disabled=i===0;up.onclick=()=>move(items.indexOf(it),items.indexOf(it)-1);
   const down=document.createElement('button');down.className='move';down.textContent='↓';down.disabled=i===active.length-1;down.onclick=()=>move(items.indexOf(it),items.indexOf(it)+1);
   const del=document.createElement('button');del.className='delete';del.textContent='×';del.onclick=()=>{if(confirm('Artikel endgültig löschen?')){items.splice(items.indexOf(it),1);save();render()}};
-  li.append(cb,grip,name,up,down,del);list.append(li);
+  li.append(cb,grip,name,edit,up,down,del);list.append(li);
  });
  empty.style.display=active.length?'none':'block';
  const historyList=document.querySelector('#historyList');
@@ -91,8 +102,19 @@ function render(){
   const cb=document.createElement('input');cb.type='checkbox';cb.className='check';cb.checked=true;cb.onchange=()=>{it.done=false;save();render()};
   const name=document.createElement('span');name.className='name';name.textContent=it.name;
   if(it.qty){const q=document.createElement('span');q.className='qtytag';q.textContent='× '+it.qty;name.append(q)}
+    const edit=document.createElement('button');
+  edit.className='move';
+  edit.textContent='✎';
+  edit.title='Menge ändern';
+  edit.onclick=()=>{
+   const qty=prompt('Neue Menge eingeben:',it.qty||'1');
+   if(qty===null)return;
+   it.qty=qty.trim();
+   save();
+   render();
+  };
   const del=document.createElement('button');del.className='delete';del.textContent='×';del.onclick=()=>{if(confirm('Artikel endgültig löschen?')){items.splice(items.indexOf(it),1);save();render()}};
-  li.append(cb,name,del);historyList.append(li);
+  li.append(cb,name,edit,del);historyList.append(li);
  });
  document.querySelector('#historyEmpty').style.display=bought.length?'none':'block';
  document.querySelector('#toggleHistory').textContent=(showDone?'Eingekaufte ausblenden':'Eingekaufte anzeigen')+' ('+bought.length+')';
