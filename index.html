@@ -83,12 +83,16 @@ function render(){
   edit.textContent='✎';
   edit.title='Menge ändern';
   edit.onclick=()=>{
-   const qty=prompt('Neue Menge eingeben:',it.qty||'1');
-   if(qty===null)return;
-   it.qty=qty.trim();
-   save();
-   render();
-  };
+ const newName=prompt('Neuen Artikelnamen eingeben:',it.name);
+ if(newName===null)return;
+ if(!newName.trim()){alert('Bitte einen Artikelnamen eingeben.');return;}
+ const qty=prompt('Neue Menge eingeben:',it.qty||'1');
+ if(qty===null)return;
+ it.name=newName.trim();
+ it.qty=qty.trim();
+ save();
+ render();
+};
   const up=document.createElement('button');up.className='move';up.textContent='↑';up.disabled=i===0;up.onclick=()=>move(items.indexOf(it),items.indexOf(it)-1);
   const down=document.createElement('button');down.className='move';down.textContent='↓';down.disabled=i===active.length-1;down.onclick=()=>move(items.indexOf(it),items.indexOf(it)+1);
   const del=document.createElement('button');del.className='delete';del.textContent='×';del.onclick=()=>{if(confirm('Artikel endgültig löschen?')){items.splice(items.indexOf(it),1);save();render()}};
@@ -107,12 +111,16 @@ function render(){
   edit.textContent='✎';
   edit.title='Menge ändern';
   edit.onclick=()=>{
-   const qty=prompt('Neue Menge eingeben:',it.qty||'1');
-   if(qty===null)return;
-   it.qty=qty.trim();
-   save();
-   render();
-  };
+ const newName=prompt('Neuen Artikelnamen eingeben:',it.name);
+ if(newName===null)return;
+ if(!newName.trim()){alert('Bitte einen Artikelnamen eingeben.');return;}
+ const qty=prompt('Neue Menge eingeben:',it.qty||'1');
+ if(qty===null)return;
+ it.name=newName.trim();
+ it.qty=qty.trim();
+ save();
+ render();
+};
   const del=document.createElement('button');del.className='delete';del.textContent='×';del.onclick=()=>{if(confirm('Artikel endgültig löschen?')){items.splice(items.indexOf(it),1);save();render()}};
   li.append(cb,name,edit,del);historyList.append(li);
  });
