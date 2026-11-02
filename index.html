@@ -6,10 +6,10 @@
 <meta name="theme-color" content="#176b52">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Моя корзина">
+<meta name="apple-mobile-web-app-title" content="Einkaufsliste">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
-<title>Моя корзина</title>
+<title>Einkaufsliste</title>
 <style>
 :root{color-scheme:light;--green:#176b52;--pale:#eaf5ef;--ink:#18231e;--muted:#718078;--line:#e3eae5}
 *{box-sizing:border-box}body{margin:0;background:#f5f8f6;color:var(--ink);font:16px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding:env(safe-area-inset-top) 16px env(safe-area-inset-bottom)}
@@ -43,26 +43,23 @@ ul{list-style:none;padding:0;margin:0}.item{display:flex;align-items:center;gap:
  <div class="panel">
   <div style="font-size:13px;font-weight:700;margin:0 0 10px 2px">Добавить товар</div>
   <form id="addForm">
-   <input class="field" id="product" placeholder="Например, молоко" autocomplete="off" required>
-   <input class="field qty" id="quantity" placeholder="Кол-во" value="1" aria-label="Количество">
-   <button class="add" aria-label="Добавить">+</button>
+  <input class="field" id="product" placeholder="Zum Beispiel Milch" autocomplete="off" required>
+   <input class="field qty" id="quantity" placeholder="Menge" value="1" aria-label="Menge">
+   <button class="add" aria-label="Hinzufügen">+</button>
   </form>
  </div>
  <div class="section"><span>Нужно купить</span><span class="hint">Перетаскивай за ⋮⋮ или используй стрелки</span></div>
  <div class="panel" style="padding:5px 9px">
   <ul id="list"></ul>
-  <div class="empty" id="empty">Список пока пуст. Добавь первый товар выше.</div>
+  <div class="empty" id="empty">Die Liste ist noch leer. Füge oben deinen ersten Artikel hinzu.</div>
  </div>
-<div class="footer"><span id="remaining">Осталось: 0</span><button class="secondary" id="toggleHistory">Показать купленное (0)</button></div>
+<div class="footer"><span id="remaining">Noch zu kaufen: 0</span><button class="secondary" id="toggleHistory">Eingekaufte anzeigen (0)</button></div>
 <div id="historyArea" hidden>
- <h3>Куплено</h3>
+ <h3>Eingekauft</h3>
  <ul id="historyList"></ul>
- <div class="empty" id="historyEmpty">Пока ничего не куплено.</div>
+ <div class="empty" id="historyEmpty">Noch nichts eingekauft.</div>
 </div>
  <div class="installnote" id="install">
-  <b>Как добавить на экран iPhone:</b><br>
-  Открой эту страницу в Safari, нажми <b>«Поделиться»</b> → <b>«На экран Домой»</b> → <b>«Добавить»</b>.
- </div>
 </main>
 <script>
 const KEY='my-basket-items-v1';
@@ -84,7 +81,7 @@ function render(){
   if(it.qty){const q=document.createElement('span');q.className='qtytag';q.textContent='× '+it.qty;name.append(q)}
   const up=document.createElement('button');up.className='move';up.textContent='↑';up.disabled=i===0;up.onclick=()=>move(items.indexOf(it),items.indexOf(it)-1);
   const down=document.createElement('button');down.className='move';down.textContent='↓';down.disabled=i===active.length-1;down.onclick=()=>move(items.indexOf(it),items.indexOf(it)+1);
-  const del=document.createElement('button');del.className='delete';del.textContent='×';del.onclick=()=>{if(confirm('Удалить товар навсегда?')){items.splice(items.indexOf(it),1);save();render()}};
+  const del=document.createElement('button');del.className='delete';del.textContent='×';del.onclick=()=>{if(confirm('Artikel endgültig löschen?')){items.splice(items.indexOf(it),1);save();render()}};
   li.append(cb,grip,name,up,down,del);list.append(li);
  });
  empty.style.display=active.length?'none':'block';
@@ -95,14 +92,14 @@ function render(){
   const cb=document.createElement('input');cb.type='checkbox';cb.className='check';cb.checked=true;cb.onchange=()=>{it.done=false;save();render()};
   const name=document.createElement('span');name.className='name';name.textContent=it.name;
   if(it.qty){const q=document.createElement('span');q.className='qtytag';q.textContent='× '+it.qty;name.append(q)}
-  const del=document.createElement('button');del.className='delete';del.textContent='×';del.onclick=()=>{if(confirm('Удалить товар навсегда?')){items.splice(items.indexOf(it),1);save();render()}};
+  const del=document.createElement('button');del.className='delete';del.textContent='×';del.onclick=()=>{if(confirm('Artikel endgültig löschen?')){items.splice(items.indexOf(it),1);save();render()}};
   li.append(cb,name,del);historyList.append(li);
  });
  document.querySelector('#historyEmpty').style.display=bought.length?'none':'block';
- document.querySelector('#toggleHistory').textContent=(showDone?'Скрыть':'Показать')+' купленное ('+bought.length+')';
+ document.querySelector('#toggleHistory').textContent=(showDone?'Eingekaufte ausblenden':'Eingekaufte anzeigen')+' ('+bought.length+')';
  document.querySelector('#historyArea').hidden=!showDone;
  document.querySelector('#counter').textContent=`${bought.length} / ${items.length}`;
- document.querySelector('#remaining').textContent=`Осталось купить: ${active.length}`;
+ document.querySelector('#remaining').textContent=`Noch zu kaufen: ${active.length}`;
 }
 document.querySelector('#toggleHistory').onclick=()=>{showDone=!showDone;render()};
  function move(from,to){const activeCount=items.filter(x=>!x.done).length;if(to<0||to>=activeCount)return;const [x]=items.splice(from,1);items.splice(to,0,x);save();render()}
