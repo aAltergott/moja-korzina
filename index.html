@@ -86,6 +86,7 @@ function render(){
  list.innerHTML='';
  visible.forEach((it,i)=>{
   const li=document.createElement('li');
+   li._item=it;
   li.className='item'+(it.done?' done':'');
   li.dataset.index=items.indexOf(it);
   const grip=document.createElement('span');
@@ -161,15 +162,113 @@ document.querySelector('#addForm').addEventListener('submit',e=>{
  const qty=document.querySelector('#quantity').value.trim();
  items.push({name,qty,done:false});document.querySelector('#product').value='';document.querySelector('#quantity').value='1';save();render();document.querySelector('#product').focus();
 });
-let dragged=null;
-list.addEventListener('dragstart',e=>{const row=e.target.closest('.item');if(!row)return;dragged=Number(row.dataset.index);row.classList.add('dragging');e.dataTransfer.effectAllowed='move'});
-list.addEventListener('dragover',e=>{e.preventDefault();const row=e.target.closest('.item');if(!row||dragged===null)return;const to=Number(row.dataset.index);if(to!==dragged){const [x]=items.splice(dragged,1);items.splice(to,0,x);dragged=to;render()}});
-list.addEventListener('dragend',()=>{dragged=null;save();render()});
-// Touch-friendly reordering: press and hold the grip, then move the finger.
-let touchFrom=null;
-list.addEventListener('pointerdown',e=>{if(!e.target.classList.contains('handle'))return;const row=e.target.closest('.item');touchFrom=Number(row.dataset.index);e.target.setPointerCapture?.(e.pointerId)});
-list.addEventListener('pointermove',e=>{if(touchFrom===null)return;const el=document.elementFromPoint(e.clientX,e.clientY)?.closest('.item');if(!el)return;const to=Number(el.dataset.index);if(to!==touchFrom){const [x]=items.splice(touchFrom,1);items.splice(to,0,x);touchFrom=to;save();render()}});
-list.addEventListener('pointerup',()=>{if(touchFrom!==null){touchFrom=null;save();render()}});
+let draggedItem=null;
+let draggedRow=null;
+let pointerX=0;
+let pointerY=0;
+let scrollFrame=null;
+
+function moveDragged(){
+ if(!draggedItem||!draggedRow)return;
+
+ const target=document.elementFromPoint(pointerX,pointerY)?.closest('.item');
+ if(!target||target===draggedRow||!list.contains(target))return;
+
+ const targetIndex=Number(target.dataset.index);
+ const from=items.indexOf(draggedItem);
+ const targetItem=items[targetIndex];
+ if(!targetItem)return;
+
+ const rect=target.getBoundingClientRect();
+ const after=pointerY>rect.top+rect.height/2;
+ let to=targetIndex+(after?1:0);
+
+ items.splice(from,1);
+ if(from<to)to--;
+ items.splice(to,0,draggedItem);
+
+ if(after)target.after(draggedRow);
+ else target.before(draggedRow);
+
+[...list.children].forEach(row=>{
+ row.dataset.index=items.indexOf(row._item);
+});
+}
+
+function autoScroll(){
+ if(!draggedItem)return;
+
+ const edge=90;
+ let speed=0;
+
+ if(pointerY<edge)speed=-12;
+ else if(pointerY>window.innerHeight-edge)speed=12;
+
+ if(speed){
+  window.scrollBy(0,speed);
+  moveDragged();
+ }
+
+ scrollFrame=requestAnimationFrame(autoScroll);
+}
+
+list.addEventListener('pointerdown',e=>{
+ if(!e.target.classList.contains('handle'))return;
+
+ draggedRow=e.target.closest('.item');
+ draggedItem=items[Number(draggedRow.dataset.index)];
+ if(!draggedItem)return;
+
+ draggedRow.classList.add('dragging');
+  draggedRow.style.pointerEvents='none';
+ pointerX=e.clientX;
+ pointerY=e.clientY;
+
+ e.target.setPointerCapture?.(e.pointerId);
+
+ if(!scrollFrame)scrollFrame=requestAnimationFrame(autoScroll);
+});
+
+document.addEventListener('pointermove',e=>{
+ if(!draggedItem)return;
+ pointerX=e.clientX;
+ pointerY=e.clientY;
+ moveDragged();
+});
+
+document.addEventListener('pointerup',()=>{
+ if(!draggedItem)return;
+
+ draggedRow.classList.remove('dragging');
+  draggedRow.style.pointerEvents='';
+ draggedItem=null;
+ draggedRow=null;
+
+ if(scrollFrame){
+  cancelAnimationFrame(scrollFrame);
+  scrollFrame=null;
+ }
+
+ save();
+ render();
+});
+
+document.addEventListener('pointercancel',()=>{
+ if(!draggedItem)return;
+
+ draggedRow.classList.remove('dragging');
+  draggedRow.style.pointerEvents='';
+ draggedItem=null;
+ draggedRow=null;
+
+ if(scrollFrame){
+  cancelAnimationFrame(scrollFrame);
+  scrollFrame=null;
+ }
+
+ save();
+ render();
+});
 render();
 if('serviceWorker' in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
 </script>
