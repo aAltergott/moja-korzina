@@ -198,13 +198,19 @@ function moveDragged(){
 function autoScroll(){
  if(!draggedItem)return;
 
- const edge=90;
+ const edge=120;
+ const maxSpeed=14;
  let speed=0;
 
- if(pointerY<edge)speed=-12;
- else if(pointerY>window.innerHeight-edge)speed=12;
+ if(pointerY<edge){
+  speed=-Math.ceil((edge-pointerY)/8);
+ }else if(pointerY>window.innerHeight-edge){
+  speed=Math.ceil((pointerY-(window.innerHeight-edge))/8);
+ }
 
- if(speed){
+ speed=Math.max(-maxSpeed,Math.min(maxSpeed,speed));
+
+ if(speed!==0){
   window.scrollBy(0,speed);
   moveDragged();
  }
