@@ -13,7 +13,7 @@
 <style>
 :root{color-scheme:light;--green:#176b52;--pale:#eaf5ef;--ink:#18231e;--muted:#718078;--line:#e3eae5}
 *{box-sizing:border-box}body{margin:0;background:#f5f8f6;color:var(--ink);font:16px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding:env(safe-area-inset-top) 16px env(safe-area-inset-bottom)}
-main{max-width:620px;margin:0 auto;padding:22px 0 34px}.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+main{max-width:620px;margin:0 auto;padding:22px 0 34px}.top{position:sticky;top:0;z-index:100;background:#f5f5f5;display:flex;align-items:center;justify-content:space-between;margin:0 -12px 20px;padding:12px;box-sizing:border-box}
 h1{font-size:27px;margin:0;font-weight:800;letter-spacing:-.6px}.subtitle{color:var(--muted);font-size:13px;margin-top:5px}
 .pill{background:var(--pale);color:var(--green);font-weight:700;padding:8px 12px;border-radius:30px;font-size:13px}
 .panel{background:white;border:1px solid var(--line);border-radius:18px;padding:14px;margin-bottom:14px;box-shadow:0 3px 14px #153d2810}
@@ -36,10 +36,11 @@ ul{list-style:none;padding:0;margin:0}.item{display:flex;align-items:center;gap:
 </head>
 <body>
 <main>
- <div class="top">
-  <div><h1>🛒 Einkaufsliste</h1><div class="subtitle">Deine Einkaufsliste immer griffbereit</div></div>
+<div class="top">
+  <div><h1>🛒 Einkaufsliste</h1></div>
+  <button class="secondary" id="toggleHistory">Eingekaufte anzeigen (0)</button>
   <div class="pill" id="counter">0 / 0</div>
- </div>
+</div>
  <div class="panel">
   <div style="font-size:13px;font-weight:700;margin:0 0 10px 2px">Artikel hinzufügen</div>
   <form id="addForm">
@@ -48,12 +49,10 @@ ul{list-style:none;padding:0;margin:0}.item{display:flex;align-items:center;gap:
    <button class="add" aria-label="Hinzufügen">+</button>
   </form>
  </div>
- <div class="section"><span>Einkaufsliste</span><span class="hint">Zum Verschieben ziehen oder Pfeile benutzen</span></div>
  <div class="panel" style="padding:5px 9px">
   <ul id="list"></ul>
   <div class="empty" id="empty">Die Liste ist noch leer. Füge oben deinen ersten Artikel hinzu.</div>
  </div>
-<div class="footer"><span id="remaining">Noch zu kaufen: 0</span><button class="secondary" id="toggleHistory">Eingekaufte anzeigen (0)</button></div>
 <div id="historyArea" hidden>
  <h3>Eingekauft</h3>
  <ul id="historyList"></ul>
@@ -72,33 +71,34 @@ function render(){
  const bought=items.filter(x=>x.done);
  const visible=showDone?items:active;
  list.innerHTML='';
-
  visible.forEach((it,i)=>{
   const li=document.createElement('li');
   li.className='item'+(it.done?' done':'');
   li.dataset.index=items.indexOf(it);
-
-  const cb=document.createElement('input');
-  cb.type='checkbox';
-  cb.className='check';
-  cb.checked=it.done;
-  cb.onchange=()=>{it.done=cb.checked;save();render()};
-
   const grip=document.createElement('span');
   grip.className='handle';
   grip.textContent='⋮⋮';
-
-  const name=document.createElement('span');
-  name.className='name';
-  name.textContent=it.name;
-
-  if(it.qty){
+ const name=document.createElement('span');
+name.className='name';
+name.textContent=it.name;
+name.style.cursor='pointer';
+name.setAttribute('role','button');
+name.setAttribute('tabindex','0');
+name.onclick=()=>{it.done=!it.done;save();render()};
+name.onkeydown=(e)=>{
+ if(e.key==='Enter'||e.key===' '){
+  e.preventDefault();
+  it.done=!it.done;
+  save();
+  render();
+ }
+};
+if(it.qty){
    const q=document.createElement('span');
    q.className='qtytag';
    q.textContent='× '+it.qty;
    name.append(q);
   }
-
   const edit=document.createElement('button');
   edit.className='move';
   edit.textContent='✎';
@@ -138,7 +138,7 @@ function render(){
    }
   };
 
-  li.append(cb,grip,name,edit,up,down,del);
+  li.append(grip,name,edit,up,down,del);
   list.append(li);
  });
 
@@ -147,10 +147,8 @@ function render(){
  document.querySelector('#toggleHistory').textContent=
   (showDone?'Ausgeblendete ausblenden':'Ausgeblendete anzeigen')+
   ' ('+bought.length+')';
-
- document.querySelector('#historyArea').hidden=true;
+document.querySelector('#historyArea').hidden=true;
  document.querySelector('#counter').textContent=`${bought.length} / ${items.length}`;
- document.querySelector('#remaining').textContent=`Noch zu kaufen: ${active.length}`;
 }
 document.querySelector('#toggleHistory').onclick=()=>{showDone=!showDone;render()};
  function move(from,to){
