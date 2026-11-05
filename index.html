@@ -57,8 +57,10 @@ ul{list-style:none;padding:0;margin:0}.item{display:flex;align-items:center;gap:
   </div>
   <div class="pill" id="counter">0 / 0</div>
 </div>
-  <div style="display:flex;justify-content:flex-end;margin:-10px 0 12px">
+  <div style="display:flex;justify-content:flex-end;flex-wrap:wrap;gap:8px;margin:-10px 0 12px">
   <button class="secondary" id="backupButton">Liste sichern</button>
+  <button class="secondary" id="restoreButton">Liste wiederherstellen</button>
+  <input type="file" id="restoreFile" accept=".json,application/json" style="display:none">
 </div>
  <div class="panel">
   <div style="font-size:13px;font-weight:700;margin:0 0 10px 2px">Artikel hinzufügen</div>
@@ -94,6 +96,39 @@ const save=()=>localStorage.setItem(KEY,JSON.stringify(items));
  a.download='Einkaufsliste-Backup.json';
  a.click();
  URL.revokeObjectURL(url);
+};
+  document.querySelector('#restoreButton').onclick=()=>{
+ const fileInput=document.querySelector('#restoreFile');
+ fileInput.value='';
+ fileInput.click();
+};
+
+document.querySelector('#restoreFile').onchange=async(e)=>{
+ const file=e.target.files[0];
+ if(!file)return;
+
+ try{
+  const text=await file.text();
+  const imported=JSON.parse(text);
+
+  if(!Array.isArray(imported)||imported.length===0||
+     !imported.every(x=>x&&typeof x.name==='string')){
+   alert('Die Sicherungsdatei ist ungültig.');
+   return;
+  }
+
+  if(!confirm('Möchtest du die aktuelle Einkaufsliste wirklich durch die Sicherung ersetzen?')){
+   return;
+  }
+
+  items=imported;
+  save();
+  showDone=false;
+  render();
+  alert('Die Einkaufsliste wurde wiederhergestellt.');
+ }catch(err){
+  alert('Die Sicherungsdatei konnte nicht gelesen werden.');
+ }
 };
 function render(){
  const active=items.filter(x=>!x.done);
