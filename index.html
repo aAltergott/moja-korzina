@@ -24,10 +24,20 @@ h1{font-size:27px;margin:0;font-weight:800;letter-spacing:-.6px}.subtitle{color:
 .lockButton{
  border:0;
  background:transparent;
- font-size:25px;
- padding:5px;
+ width:36px;
+ height:36px;
+ padding:4px;
  cursor:pointer;
  flex:none;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ color:#263238;
+}
+.lockButton svg{
+ width:28px;
+ height:28px;
+ display:block;
 }
 .pill{background:var(--pale);color:var(--green);font-weight:700;padding:8px 12px;border-radius:30px;font-size:13px}
 .panel{background:white;border:1px solid var(--line);border-radius:18px;padding:14px;margin-bottom:14px;box-shadow:0 3px 14px #153d2810}
@@ -195,8 +205,9 @@ list.append(li);
  });
  empty.style.display=visible.length?'none':'block';
  const lockButton=document.querySelector('#toggleHistory');
-lockButton.textContent=showDone?'🔓':'🔒';
+
 lockButton.title=showDone?'Eingekaufte ausblenden':'Eingekaufte anzeigen';
+  lockButton.textContent=showDone?'🔓':'🔒';
 lockButton.setAttribute('aria-label',lockButton.title);
 document.querySelector('#historyArea').hidden=true;
  document.querySelector('#counter').textContent=`${bought.length} / ${items.length}`;
