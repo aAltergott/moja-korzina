@@ -15,6 +15,20 @@
 *{box-sizing:border-box}body{margin:0;background:#f5f8f6;color:var(--ink);font:16px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding:env(safe-area-inset-top) 16px env(safe-area-inset-bottom)}
 main{max-width:620px;margin:0 auto;padding:22px 0 34px}.top{position:sticky;top:0;z-index:100;background:#f5f5f5;display:flex;align-items:center;justify-content:space-between;margin:0 -12px 20px;padding:12px;box-sizing:border-box}
 h1{font-size:27px;margin:0;font-weight:800;letter-spacing:-.6px}.subtitle{color:var(--muted);font-size:13px;margin-top:5px}
+  .brand{
+ display:flex;
+ align-items:center;
+ gap:14px;
+ min-width:0;
+}
+.lockButton{
+ border:0;
+ background:transparent;
+ font-size:25px;
+ padding:5px;
+ cursor:pointer;
+ flex:none;
+}
 .pill{background:var(--pale);color:var(--green);font-weight:700;padding:8px 12px;border-radius:30px;font-size:13px}
 .panel{background:white;border:1px solid var(--line);border-radius:18px;padding:14px;margin-bottom:14px;box-shadow:0 3px 14px #153d2810}
 form{display:flex;gap:8px}.field{min-width:0;flex:1;border:1px solid var(--line);border-radius:12px;padding:13px;font:inherit;background:#fff;color:var(--ink)}
@@ -37,8 +51,10 @@ ul{list-style:none;padding:0;margin:0}.item{display:flex;align-items:center;gap:
 <body>
 <main>
 <div class="top">
-  <div><h1>🛒 Einkaufsliste</h1></div>
-  <button class="secondary" id="toggleHistory">Eingekaufte anzeigen (0)</button>
+  <div class="brand">
+    <h1>🛒 Einkaufsliste</h1>
+    <button id="toggleHistory" class="lockButton" aria-label="Eingekaufte anzeigen" title="Eingekaufte anzeigen">🔒</button>
+  </div>
   <div class="pill" id="counter">0 / 0</div>
 </div>
   <div style="display:flex;justify-content:flex-end;margin:-10px 0 12px">
@@ -142,10 +158,11 @@ del.onclick=()=>{
   li.append(grip,name,edit,del);
 list.append(li);
  });
- empty.style.display=active.length?'none':'block';
- document.querySelector('#toggleHistory').textContent=
-  (showDone?'Ausgeblendete ausblenden':'Ausgeblendete anzeigen')+
-  ' ('+bought.length+')';
+ empty.style.display=visible.length?'none':'block';
+ const lockButton=document.querySelector('#toggleHistory');
+lockButton.textContent=showDone?'🔓':'🔒';
+lockButton.title=showDone?'Eingekaufte ausblenden':'Eingekaufte anzeigen';
+lockButton.setAttribute('aria-label',lockButton.title);
 document.querySelector('#historyArea').hidden=true;
  document.querySelector('#counter').textContent=`${bought.length} / ${items.length}`;
 }
