@@ -15,31 +15,31 @@
 *{box-sizing:border-box}body{margin:0;background:#f5f8f6;color:var(--ink);font:16px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding:env(safe-area-inset-top) 16px env(safe-area-inset-bottom)}
 main{max-width:620px;margin:0 auto;padding:22px 0 34px}.top{position:sticky;top:0;z-index:100;background:#f5f5f5;display:flex;align-items:center;justify-content:space-between;margin:0 -12px 20px;padding:12px;box-sizing:border-box}
 h1{font-size:27px;margin:0;font-weight:800;letter-spacing:-.6px}.subtitle{color:var(--muted);font-size:13px;margin-top:5px}
-  .brand{
- display:flex;
+  .Marke{
+ Anzeige:flex;
  align-items:center;
- gap:14px;
- min-width:0;
+ Abstand:14px;
+ Mindestbreite: 0;
 }
 .lockButton{
- border:0;
- background:transparent;
- width:64px;
- height:64px;
- padding:0;
- cursor:pointer;
+ Rahmen:0;
+ Hintergrund: transparent;
+ Breite: 64px;
+ Höhe: 64px;
+ Padding:0;
+ Cursor:Zeiger;
  flex:none;
- display:flex;
+ Anzeige:flex;
  align-items:center;
  justify-content:center;
- color:#263238;
- font-size:52px;
- line-height:1;
+ Farbe: #263238;
+ Schriftgröße: 52px;
+ Zeilenhöhe:1;
 }
 .lockButton svg{
- width:28px;
- height:28px;
- display:block;
+ Breite: 28px;
+ Höhe: 28px;
+ Anzeige: Block;
 }
 .pill{background:var(--pale);color:var(--green);font-weight:700;padding:8px 12px;border-radius:30px;font-size:13px}
 .panel{background:white;border:1px solid var(--line);border-radius:18px;padding:14px;margin-bottom:14px;box-shadow:0 3px 14px #153d2810}
@@ -48,24 +48,22 @@ form{display:flex;gap:8px}.field{min-width:0;flex:1;border:1px solid var(--line)
 .section{display:flex;justify-content:space-between;align-items:center;margin:19px 3px 9px;font-size:14px;font-weight:750}.hint{font-size:12px;color:var(--muted);font-weight:500}
 ul{list-style:none;padding:0;margin:0}.item{display:flex;align-items:center;gap:9px;padding:11px 8px;border-bottom:1px solid #eef2ef;min-height:57px;background:#fff;border-radius:10px}.item:last-child{border-bottom:0}
 .item.done .name{text-decoration:line-through;color:#9aa59e}.check{width:23px;height:23px;accent-color:var(--green);flex:none}
-.name{
+.Name{
  flex:1;
- min-width:0;
- overflow-wrap:anywhere;
- user-select:none;
+ Mindestbreite: 0;
+ overflow-wrap: überall;
+ Benutzerauswahl: keine;
  -webkit-user-select:none;
  -webkit-touch-callout:none;
- touch-action:none;
-}
-  .qtytag{color:var(--muted);font-size:13px;margin-left:5px}
+}.qtytag{color:var(--muted);font-size:13px;margin-left:5px}
 .move{border:0;background:#f1f5f2;color:#4b5c52;border-radius:8px;width:32px;height:32px;font-size:16px;flex:none}.move:disabled{opacity:.25}
-.handle{
- color:#9aa79f;
- font-size:20px;
+.handhaben{
+ Farbe: #9aa79f;
+ Schriftgröße: 20px;
  padding:0 2px;
- touch-action:none;
- cursor:grab;
- user-select:none;
+ Touch-Aktion: keine;
+ Cursor:greifen;
+ Benutzerauswahl: keine;
  -webkit-user-select:none;
  -webkit-touch-callout:none;
  -webkit-user-drag:none;
@@ -78,14 +76,14 @@ ul{list-style:none;padding:0;margin:0}.item{display:flex;align-items:center;gap:
 .installnote{background:#fff8e8;border:1px solid #f1dfb7;border-radius:14px;padding:13px;font-size:13px;line-height:1.45;margin-top:16px;color:#66522b}
 @media(min-width:500px){main{padding-top:35px}}
   main, main *{
- user-select:none;
+ Benutzerauswahl: keine;
  -webkit-user-select:none;
  -webkit-touch-callout:none;
  -webkit-user-drag:none;
 }
 
-input, textarea{
- user-select:text;
+Eingabefeld, Textbereich{
+ Benutzerauswahl:Text;
  -webkit-user-select:text;
 }
 </style>
@@ -107,7 +105,7 @@ input, textarea{
  <div class="panel">
   <div style="font-size:13px;font-weight:700;margin:0 0 10px 2px">Artikel hinzufügen</div>
   <form id="addForm">
-  <input class="field" id="product" placeholder="Zum Beispiel Milch" autocomplete="off" required>
+  <input class="field" id="product" placeholder="Zum Beispiel Milch" autocomplete="off" erforderlich>
    <input class="field qty" id="quantity" placeholder="Menge" value="1" aria-label="Menge">
    <button class="add" aria-label="Hinzufügen">+</button>
   </form>
@@ -117,7 +115,7 @@ input, textarea{
   <div class="empty" id="empty">Die Liste ist noch leer. Füge oben deinen ersten Artikel hinzu.</div>
  </div>
 <div id="historyArea" hidden>
- <h3>Eingekauft</h3>
+ <h3>Einkauft</h3>
  <ul id="historyList"></ul>
  <div class="empty" id="historyEmpty">Noch nichts eingekauft.</div>
 </div>
@@ -149,27 +147,27 @@ document.querySelector('#restoreFile').onchange=async(e)=>{
  const file=e.target.files[0];
  if(!file)return;
 
- try{
+ versuchen{
   const text=await file.text();
   const imported=JSON.parse(text);
 
   if(!Array.isArray(imported)||imported.length===0||
      !imported.every(x=>x&&typeof x.name==='string')){
-   alert('Die Sicherungsdatei ist ungültig.');
-   return;
+   Alert('Die Sicherungsdatei ist ungültig.');
+   zurückkehren;
   }
 
   if(!confirm('Möchtest du die aktuelle Einkaufsliste wirklich durch die Sicherung ersetzen?')){
-   return;
+   zurückkehren;
   }
 
-  items=imported;
-  save();
+  Artikel=importiert;
+  speichern();
   showDone=false;
-  render();
-  alert('Die Einkaufsliste wurde wiederhergestellt.');
+  machen();
+  Alert('Die Einkaufsliste wurde wiederhergestellt.');
  }catch(err){
-  alert('Die Sicherungsdatei konnte nicht gelesen werden.');
+  Alert('Die Sicherungsdatei konnte nicht gelesen werden.');
  }
 };
 function render(){
@@ -182,6 +180,9 @@ function render(){
    li._item=it;
   li.className='item'+(it.done?' done':'');
   li.dataset.index=items.indexOf(it);
+  const grip=document.createElement('span');
+  grip.className='handle';
+  grip.textContent='⋮⋮';
  const name=document.createElement('span');
 name.className='name';
 name.textContent=it.name;
@@ -193,8 +194,8 @@ name.onkeydown=(e)=>{
  if(e.key==='Enter'||e.key===' '){
   e.preventDefault();
   it.done=!it.done;
-  save();
-  render();
+  speichern();
+  machen();
  }
 };
 if(it.qty){
@@ -215,8 +216,8 @@ if(it.qty){
    if(qty===null)return;
    it.name=newName.trim();
    it.qty=qty.trim();
-   save();
-   render();
+   speichern();
+   machen();
   };
    const del=document.createElement('button');
 del.className='delete';
@@ -225,11 +226,11 @@ del.title='Artikel löschen';
 del.onclick=()=>{
  if(confirm('Artikel löschen?')){
   items=items.filter(x=>x!==it);
-  save();
-  render();
+  speichern();
+  machen();
  }
 };
-  li.append(name,edit,del);
+  li.append(grip,name,edit,del);
 list.append(li);
  });
  empty.style.display=visible.length?'none':'block';
@@ -242,12 +243,12 @@ document.querySelector('#historyArea').hidden=true;
  document.querySelector('#counter').textContent=`${bought.length} / ${items.length}`;
 }
 document.querySelector('#toggleHistory').onclick=()=>{showDone=!showDone;render()};
- function move(from,to){
+ Funktion move(von,nach){
  if(to<0||to>=items.length)return;
  const [x]=items.splice(from,1);
  items.splice(to,0,x);
- save();
- render();
+ speichern();
+ machen();
 }
 document.querySelector('#addForm').addEventListener('submit',e=>{
  e.preventDefault();const name=document.querySelector('#product').value.trim();if(!name)return;
@@ -256,16 +257,9 @@ document.querySelector('#addForm').addEventListener('submit',e=>{
 });
 let draggedItem=null;
 let draggedRow=null;
-let pendingRow=null;
-let pendingItem=null;
-let pointerId=null;
 let pointerX=0;
 let pointerY=0;
-let lastPointerY=0;
-let pressTimer=null;
 let scrollFrame=null;
-let scrollingByFinger=false;
-let suppressNextClick=false;
 
 function moveDragged(){
  if(!draggedItem||!draggedRow)return;
@@ -287,30 +281,27 @@ function moveDragged(){
  items.splice(to,0,draggedItem);
 
  if(after)target.after(draggedRow);
- else target.before(draggedRow);
+ sonst target.before(draggedRow);
 
- [...list.children].forEach(row=>{
-  row.dataset.index=items.indexOf(row._item);
- });
+[...list.children].forEach(row=>{
+ row.dataset.index=items.indexOf(row._item);
+});
 }
 
 function autoScroll(){
- if(!draggedItem){
-  scrollFrame=null;
-  return;
- }
+ if(!draggedItem)return;
 
  const edge=120;
  const maxSpeed=14;
- let speed=0;
+ Geschwindigkeit = 0;
 
  if(pointerY<edge){
-  speed=-Math.ceil((edge-pointerY)/8);
+  Geschwindigkeit=-Math.ceil((Kanten-ZeigerY)/8);
  }else if(pointerY>window.innerHeight-edge){
-  speed=Math.ceil((pointerY-(window.innerHeight-edge))/8);
+  Geschwindigkeit=Math.ceil((pointerY-(window.innerHeight-edge))/8);
  }
 
- speed=Math.max(-maxSpeed,Math.min(maxSpeed,speed));
+ Geschwindigkeit = Math.max(-maxSpeed, Math.min(maxSpeed, Geschwindigkeit));
 
  if(speed!==0){
   window.scrollBy(0,speed);
@@ -320,356 +311,64 @@ function autoScroll(){
  scrollFrame=requestAnimationFrame(autoScroll);
 }
 
-function startDragging(){
- if(!pendingRow||!pendingItem)return;
+list.addEventListener('pointerdown',e=>{
+ if(!e.target.classList.contains('handle'))return;
 
- draggedRow=pendingRow;
- draggedItem=pendingItem;
-
- pendingRow=null;
- pendingItem=null;
+ draggedRow=e.target.closest('.item');
+ draggedItem=items[Number(draggedRow.dataset.index)];
+ if(!draggedItem)return;
 
  draggedRow.classList.add('dragging');
- draggedRow.style.pointerEvents='none';
-
- suppressNextClick=true;
- setTimeout(()=>{suppressNextClick=false;},500);
-
- scrollFrame=requestAnimationFrame(autoScroll);
-}
-
-list.addEventListener('pointerdown',e=>{
- if(e.button!==0)return;
-
- const name=e.target.closest('.name');
- if(!name)return;
-
- const row=name.closest('.item');
- if(!row)return;
-
- pendingRow=row;
- pendingItem=items[Number(row.dataset.index)];
- if(!pendingItem)return;
-
- pointerId=e.pointerId;
+  draggedRow.style.pointerEvents='none';
  pointerX=e.clientX;
  pointerY=e.clientY;
- lastPointerY=e.clientY;
- scrollingByFinger=false;
 
- list.setPointerCapture(e.pointerId);
+ e.target.setPointerCapture?.(e.pointerId);
 
- pressTimer=setTimeout(()=>{
-  startDragging();
- },450);
+ if(!scrollFrame)scrollFrame=requestAnimationFrame(autoScroll);
 });
 
 document.addEventListener('pointermove',e=>{
- if(pointerId===null||e.pointerId!==pointerId)return;
-
+ if(!draggedItem)return;
  pointerX=e.clientX;
  pointerY=e.clientY;
-
- if(draggedItem){
-  moveDragged();
-  e.preventDefault();
-  return;
- }
-
- if(pendingRow){
-  const dx=Math.abs(e.clientX-pointerX);
-  const dy=Math.abs(e.clientY-lastPointerY);
-
-  if(dx>10||dy>10){
-   clearTimeout(pressTimer);
-   pressTimer=null;
-   pendingRow=null;
-   pendingItem=null;
-   scrollingByFinger=true;
-  }
- }
-
- if(scrollingByFinger){
-  window.scrollBy(0,lastPointerY-e.clientY);
-  lastPointerY=e.clientY;
-  e.preventDefault();
- }
-},{passive:false});
-
-document.addEventListener('pointerup',e=>{
- if(pointerId===null||e.pointerId!==pointerId)return;
-
- clearTimeout(pressTimer);
- pressTimer=null;
-
- if(draggedItem){
-  draggedRow.classList.remove('dragging');
-  draggedRow.style.pointerEvents='';
-
-  draggedItem=null;
-  draggedRow=null;
-
-  if(scrollFrame){
-   cancelAnimationFrame(scrollFrame);
-   scrollFrame=null;
-  }
-
-  save();
-  render();
- }
-
- pendingRow=null;
- pendingItem=null;
- scrollingByFinger=false;
- pointerId=null;
+ moveDragged();
 });
 
-document.addEventListener('pointercancel',e=>{
- if(pointerId===null||e.pointerId!==pointerId)return;
+document.addEventListener('pointerup',()=>{
+ if(!draggedItem)return;
 
- clearTimeout(pressTimer);
- pressTimer=null;
-
- if(draggedItem){
-  draggedRow.classList.remove('dragging');
+ draggedRow.classList.remove('dragging');
   draggedRow.style.pointerEvents='';
+ draggedItem=null;
+ draggedRow=null;
 
-  draggedItem=null;
-  draggedRow=null;
-
-  if(scrollFrame){
-   cancelAnimationFrame(scrollFrame);
-   scrollFrame=null;
-  }
-
-  save();
-  render();
- }
-
- pendingRow=null;
- pendingItem=null;
- scrollingByFinger=false;
- pointerId=null;
-});
-
-document.addEventListener('click',e=>{
- if(suppressNextClick){
-  e.preventDefault();
-  e.stopImmediatePropagation();
-  suppressNextClick=false;
- }
-},true);
-  let draggedItem=null;
-let draggedRow=null;
-let pendingRow=null;
-let pendingItem=null;
-let pointerId=null;
-let pointerX=0;
-let pointerY=0;
-let startX=0;
-let startY=0;
-let lastY=0;
-let pressTimer=null;
-let scrollFrame=null;
-let scrollingByFinger=false;
-let suppressClick=false;
-
-function moveDragged(){
- if(!draggedItem||!draggedRow)return;
-
- const target=document.elementFromPoint(pointerX,pointerY)?.closest('.item');
- if(!target||target===draggedRow||!list.contains(target))return;
-
- const targetIndex=Number(target.dataset.index);
- const from=items.indexOf(draggedItem);
- const targetItem=items[targetIndex];
- if(!targetItem)return;
-
- const rect=target.getBoundingClientRect();
- const after=pointerY>rect.top+rect.height/2;
- let to=targetIndex+(after?1:0);
-
- items.splice(from,1);
- if(from<to)to--;
- items.splice(to,0,draggedItem);
-
- if(after)target.after(draggedRow);
- else target.before(draggedRow);
-
- [...list.children].forEach(row=>{
-  row.dataset.index=items.indexOf(row._item);
- });
-}
-
-function autoScroll(){
- if(!draggedItem){
+ if(scrollFrame){
+  cancelAnimationFrame(scrollFrame);
   scrollFrame=null;
-  return;
  }
 
- const edge=120;
- const maxSpeed=14;
- let speed=0;
-
- if(pointerY<edge){
-  speed=-Math.ceil((edge-pointerY)/8);
- }else if(pointerY>window.innerHeight-edge){
-  speed=Math.ceil((pointerY-(window.innerHeight-edge))/8);
- }
-
- speed=Math.max(-maxSpeed,Math.min(maxSpeed,speed));
-
- if(speed!==0){
-  window.scrollBy(0,speed);
-  moveDragged();
- }
-
- scrollFrame=requestAnimationFrame(autoScroll);
-}
-
-function startDragging(){
- if(!pendingRow||!pendingItem)return;
-
- draggedRow=pendingRow;
- draggedItem=pendingItem;
-
- pendingRow=null;
- pendingItem=null;
-
- draggedRow.classList.add('dragging');
- draggedRow.style.pointerEvents='none';
-
- suppressClick=true;
- setTimeout(()=>{suppressClick=false;},700);
-
- scrollFrame=requestAnimationFrame(autoScroll);
-}
-
-list.addEventListener('pointerdown',e=>{
- const name=e.target.closest('.name');
- if(!name)return;
- if(e.button!==0)return;
-
- const row=name.closest('.item');
- if(!row)return;
-
- pendingRow=row;
- pendingItem=items[Number(row.dataset.index)];
- if(!pendingItem)return;
-
- pointerId=e.pointerId;
- pointerX=e.clientX;
- pointerY=e.clientY;
- startX=e.clientX;
- startY=e.clientY;
- lastY=e.clientY;
- scrollingByFinger=false;
-
- list.setPointerCapture(e.pointerId);
-
- pressTimer=setTimeout(()=>{
-  startDragging();
- },450);
+ speichern();
+ machen();
 });
 
-document.addEventListener('pointermove',e=>{
- if(pointerId===null||e.pointerId!==pointerId)return;
+document.addEventListener('pointercancel',()=>{
+ if(!draggedItem)return;
 
- pointerX=e.clientX;
- pointerY=e.clientY;
-
- if(draggedItem){
-  moveDragged();
-  e.preventDefault();
-  return;
- }
-
- if(pendingRow){
-  const dx=Math.abs(e.clientX-startX);
-  const dy=Math.abs(e.clientY-startY);
-
-  if(dx>10||dy>10){
-   clearTimeout(pressTimer);
-   pressTimer=null;
-   pendingRow=null;
-   pendingItem=null;
-   scrollingByFinger=true;
-   suppressClick=true;
-   setTimeout(()=>{suppressClick=false;},700);
-  }
- }
-
- if(scrollingByFinger){
-  window.scrollBy(0,lastY-e.clientY);
-  lastY=e.clientY;
-  e.preventDefault();
- }
-},{passive:false});
-
-document.addEventListener('pointerup',e=>{
- if(pointerId===null||e.pointerId!==pointerId)return;
-
- clearTimeout(pressTimer);
- pressTimer=null;
-
- if(draggedItem){
-  draggedRow.classList.remove('dragging');
+ draggedRow.classList.remove('dragging');
   draggedRow.style.pointerEvents='';
+ draggedItem=null;
+ draggedRow=null;
 
-  draggedItem=null;
-  draggedRow=null;
-
-  if(scrollFrame){
-   cancelAnimationFrame(scrollFrame);
-   scrollFrame=null;
-  }
-
-  save();
-  render();
+ if(scrollFrame){
+  cancelAnimationFrame(scrollFrame);
+  scrollFrame=null;
  }
 
- pendingRow=null;
- pendingItem=null;
- scrollingByFinger=false;
- pointerId=null;
+ speichern();
+ machen();
 });
-
-document.addEventListener('pointercancel',e=>{
- if(pointerId===null||e.pointerId!==pointerId)return;
-
- clearTimeout(pressTimer);
- pressTimer=null;
-
- if(draggedItem){
-  draggedRow.classList.remove('dragging');
-  draggedRow.style.pointerEvents='';
-
-  draggedItem=null;
-  draggedRow=null;
-
-  if(scrollFrame){
-   cancelAnimationFrame(scrollFrame);
-   scrollFrame=null;
-  }
-
-  save();
-  render();
- }
-
- pendingRow=null;
- pendingItem=null;
- scrollingByFinger=false;
- pointerId=null;
-});
-
-document.addEventListener('click',e=>{
- if(suppressClick&&e.target.closest('.item')){
-  e.preventDefault();
-  e.stopImmediatePropagation();
-  suppressClick=false;
- }
-},true);
-render();
+machen();
 if('serviceWorker' in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
 </script>
 </body></html>
