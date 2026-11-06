@@ -321,8 +321,10 @@ function autoScroll(){
 
  if(speed!==0){
   window.scrollBy(0,speed);
-  moveDragged();
- }
+  requestAnimationFrame(()=>{
+   if(draggedItem)moveDragged();
+  });
+}
 
  scrollFrame=requestAnimationFrame(autoScroll);
 }
