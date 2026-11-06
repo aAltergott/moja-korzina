@@ -97,7 +97,7 @@ input, textarea{
   </div>
   <div class="pill" id="counter">0 / 0</div>
 </div>
-  <div style="display:flex;justify-content:flex-end;flex-wrap:wrap;gap:8px;margin:-10px 0 12px">
+  <div id="backupControls" style="display:flex;justify-content:flex-end;flex-wrap:wrap;gap:8px;margin:-10px 0 12px">
   <button class="secondary" id="backupButton">Liste sichern</button>
   <button class="secondary" id="restoreButton">Liste wiederherstellen</button>
   <input type="file" id="restoreFile" accept=".json,application/json" style="display:none">
@@ -123,11 +123,14 @@ input, textarea{
 <script>
 const KEY='my-basket-items-v1';
 let items=[];
-let showDone=false;
+let showDone=localStorage.getItem('my-basket-edit-mode-v1')==='true';
+const MODE_KEY='my-basket-edit-mode-v1';
 try{items=JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){items=[]}
 const list=document.querySelector('#list'),empty=document.querySelector('#empty');
 const save=()=>localStorage.setItem(KEY,JSON.stringify(items));
+  const saveMode=()=>localStorage.setItem(MODE_KEY,String(showDone));
   document.querySelector('#backupButton').onclick=()=>{
+     if(!showDone)return;
  const data=JSON.stringify(items,null,2);
  const blob=new Blob([data],{type:'application/json'});
  const url=URL.createObjectURL(blob);
@@ -138,12 +141,14 @@ const save=()=>localStorage.setItem(KEY,JSON.stringify(items));
  URL.revokeObjectURL(url);
 };
   document.querySelector('#restoreButton').onclick=()=>{
+     if(!showDone)return;
  const fileInput=document.querySelector('#restoreFile');
  fileInput.value='';
  fileInput.click();
 };
 
 document.querySelector('#restoreFile').onchange=async(e)=>{
+   if(!showDone)return;
  const file=e.target.files[0];
  if(!file)return;
 
@@ -164,6 +169,7 @@ document.querySelector('#restoreFile').onchange=async(e)=>{
   items=imported;
   save();
   showDone=false;
+   saveMode();
   render();
   alert('Die Einkaufsliste wurde wiederhergestellt.');
  }catch(err){
@@ -231,19 +237,27 @@ del.onclick=()=>{
  }
 };
   li.append(grip,name,edit,del);
+   grip.hidden=!showDone;
+edit.hidden=!showDone;
+del.hidden=!showDone;
 list.append(li);
  });
  empty.style.display=visible.length?'none':'block';
  const lockButton=document.querySelector('#toggleHistory');
 
-lockButton.title=showDone?'Eingekaufte ausblenden':'Eingekaufte anzeigen';
-  lockButton.textContent=showDone?'🔓':'🔒';
+lockButton.title=showDone?'Einkaufsmodus aktivieren':'Bearbeiten aktivieren';
+lockButton.textContent=showDone?'🔓':'🔒';
 lockButton.setAttribute('aria-label',lockButton.title);
 document.querySelector('#historyArea').hidden=true;
+  document.querySelector('#backupControls').hidden=!showDone;
+document.querySelector('#addForm').parentElement.hidden=!showDone;
  document.querySelector('#counter').textContent=`${bought.length} / ${items.length}`;
 }
-document.querySelector('#toggleHistory').onclick=()=>{showDone=!showDone;render()};
- function move(from,to){
+document.querySelector('#toggleHistory').onclick=()=>{
+ showDone=!showDone;
+ saveMode();
+ render();
+}; function move(from,to){
  if(to<0||to>=items.length)return;
  const [x]=items.splice(from,1);
  items.splice(to,0,x);
@@ -251,7 +265,9 @@ document.querySelector('#toggleHistory').onclick=()=>{showDone=!showDone;render(
  render();
 }
 document.querySelector('#addForm').addEventListener('submit',e=>{
- e.preventDefault();const name=document.querySelector('#product').value.trim();if(!name)return;
+ e.preventDefault();
+ if(!showDone)return;
+ const name=document.querySelector('#product').value.trim();if(!name)return;
  const qty=document.querySelector('#quantity').value.trim();
  items.push({name,qty,done:false});document.querySelector('#product').value='';document.querySelector('#quantity').value='1';save();render();document.querySelector('#product').focus();
 });
@@ -312,6 +328,7 @@ function autoScroll(){
 }
 
 list.addEventListener('pointerdown',e=>{
+   if(!showDone)return;
  if(!e.target.classList.contains('handle'))return;
 
  draggedRow=e.target.closest('.item');
