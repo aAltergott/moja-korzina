@@ -251,7 +251,7 @@ lockButton.setAttribute('aria-label',lockButton.title);
 document.querySelector('#historyArea').hidden=true;
   document.querySelector('#backupControls').style.display=showDone?'flex':'none';
 document.querySelector('#addForm').parentElement.style.display=showDone?'':'none';
- document.querySelector('#counter').textContent=`${bought.length} / ${items.length}`;
+ document.querySelector('#counter').textContent=active.length;
 }
 document.querySelector('#toggleHistory').onclick=()=>{
  showDone=!showDone;
