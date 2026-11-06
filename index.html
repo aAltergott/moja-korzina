@@ -249,8 +249,8 @@ lockButton.title=showDone?'Einkaufsmodus aktivieren':'Bearbeiten aktivieren';
 lockButton.textContent=showDone?'🔓':'🔒';
 lockButton.setAttribute('aria-label',lockButton.title);
 document.querySelector('#historyArea').hidden=true;
-  document.querySelector('#backupControls').hidden=!showDone;
-document.querySelector('#addForm').parentElement.hidden=!showDone;
+  document.querySelector('#backupControls').style.display=showDone?'flex':'none';
+document.querySelector('#addForm').parentElement.style.display=showDone?'':'none';
  document.querySelector('#counter').textContent=`${bought.length} / ${items.length}`;
 }
 document.querySelector('#toggleHistory').onclick=()=>{
