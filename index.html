@@ -322,14 +322,14 @@ li.addEventListener('touchmove',e=>{
  li.classList.remove('swipe-return');
  li.style.setProperty('--swipe-offset',dx+'px');
 
- if(dx>=70)li.classList.add('swipe-ready');
+ if(dx>=110)li.classList.add('swipe-ready');
  else li.classList.remove('swipe-ready');
 },{passive:true});
 
 li.addEventListener('touchend',()=>{
  if(showDone)return;
 
- if(swipeDx>=70){
+ if(swipeDx>=110){
   li.classList.add('swipe-complete');
   li.style.setProperty('--swipe-offset',window.innerWidth+'px');
 
