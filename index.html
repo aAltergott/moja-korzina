@@ -194,8 +194,14 @@ name.textContent=it.name;
 name.style.cursor='pointer';
 name.setAttribute('role','button');
 name.setAttribute('tabindex','0');
-name.onclick=()=>{it.done=!it.done;save();render()};
+name.onclick=()=>{
+ if(!showDone)return;
+ it.done=!it.done;
+ save();
+ render();
+};
 name.onkeydown=(e)=>{
+ if(!showDone)return;
  if(e.key==='Enter'||e.key===' '){
   e.preventDefault();
   it.done=!it.done;
@@ -240,6 +246,28 @@ del.onclick=()=>{
 edit.hidden=!showDone;
 del.hidden=!showDone;
 list.append(li);
+   let touchStartX=0;
+let touchStartY=0;
+
+li.addEventListener('touchstart',e=>{
+ if(showDone)return;
+ const t=e.touches[0];
+ touchStartX=t.clientX;
+ touchStartY=t.clientY;
+},{passive:true});
+
+li.addEventListener('touchend',e=>{
+ if(showDone)return;
+ const t=e.changedTouches[0];
+ const dx=t.clientX-touchStartX;
+ const dy=t.clientY-touchStartY;
+
+ if(dx>70&&Math.abs(dx)>Math.abs(dy)*1.3){
+  it.done=true;
+  save();
+  render();
+ }
+},{passive:true});
  });
  empty.style.display=visible.length?'none':'block';
  const lockButton=document.querySelector('#toggleHistory');
