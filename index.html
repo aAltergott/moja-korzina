@@ -107,6 +107,11 @@ ul{list-style:none;padding:0;margin:0}.item{display:flex;align-items:center;gap:
  -webkit-user-select:none;
  -webkit-touch-callout:none;
 }.qtytag{color:var(--muted);font-size:13px;margin-left:5px}
+  body.shopping-mode .qtytag{
+ color:#000;
+ font-size:16.25px;
+ font-weight:600;
+}
 .move{border:0;background:#f1f5f2;color:#4b5c52;border-radius:8px;width:32px;height:32px;font-size:16px;flex:none}.move:disabled{opacity:.25}
 .handle{
  color:#9aa79f;
@@ -227,6 +232,7 @@ document.querySelector('#restoreFile').onchange=async(e)=>{
  }
 };
 function render(){
+  document.body.classList.toggle('shopping-mode',!showDone);
  const active=items.filter(x=>!x.done);
  const bought=items.filter(x=>x.done);
  const visible=showDone?items:active;
